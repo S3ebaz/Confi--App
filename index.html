@@ -309,6 +309,9 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--f);min-height
   <div class="cs-logo">🛡️</div>
   <h1 class="cs-title">ConfiAPP</h1>
   <p class="cs-sub">Esta app analizará las aplicaciones instaladas<br>en tu dispositivo para medir su nivel de riesgo.</p>
+  <p style="font-size:11px;color:#f5c542;text-align:center;margin-top:-18px;margin-bottom:18px;">
+    En navegador se muestra una demo con datos de ejemplo.
+  </p>
 
   <div class="cs-box">
     <div class="cs-box-title">Qué se leerá del dispositivo</div>
@@ -410,6 +413,15 @@ var filter   = "all";
 var aiCache  = {};
 var iconCache= {};
 
+// Detectar si estamos dentro de la app Android nativa (con puente Kotlin)
+// o en navegador / GitHub Pages (modo demo con datos de ejemplo)
+let isAndroid = false;
+try {
+  isAndroid = (typeof Android !== "undefined") && Android.ping && Android.ping() === true;
+} catch (_) {
+  isAndroid = false;
+}
+
 // ── Helpers de color ─────────────────────────────────────────────────────────
 function rColor(r){ return {alto:"var(--red)",medio:"var(--orange)",bajo:"var(--yellow)",seguro:"var(--green)"}[r] }
 function rBg(r)   { return {alto:"var(--rbg)",medio:"var(--obg)",bajo:"var(--ybg)",seguro:"var(--gbg)"}[r] }
@@ -434,9 +446,61 @@ function consentAndScan(){
 function startScan(){
   var btn = document.getElementById("scan-btn");
   btn.disabled = true;
+
+  if (!isAndroid) {
+    // ═══════════════════════════════════════════════════════════════
+    // MODO DEMO (navegador / GitHub Pages)
+    // ═══════════════════════════════════════════════════════════════
+    btn.textContent = "Cargando demo…";
+
+    document.getElementById("dev-bar").classList.remove("show");
+
+    var prog = document.getElementById("prog");
+    var fill = document.getElementById("prog-fill");
+    var lbl  = document.getElementById("prog-lbl");
+    prog.classList.add("show");
+    fill.style.width = "0%";
+
+    var steps = [
+      "Preparando datos de ejemplo…",
+      "Simulando análisis de permisos…",
+      "Calculando puntuaciones de riesgo…",
+      "Cargando apps conocidas…",
+      "Listo"
+    ];
+    var pct  = 0;
+    var step = 0;
+    var iv = setInterval(function(){
+      pct += 22;
+      if(pct > 95) pct = 95;
+      fill.style.width = pct + "%";
+      lbl.textContent = steps[Math.min(step++, steps.length-1)];
+    }, 180);
+
+    setTimeout(function(){
+      clearInterval(iv);
+      fill.style.width = "100%";
+      lbl.textContent = "8 apps de ejemplo cargadas";
+
+      APPS = getDemoApps();
+
+      setTimeout(function(){
+        prog.classList.remove("show");
+        finishScan();
+        showDemoBanner();
+        btn.disabled = false;
+        btn.textContent = "Re-analizar (demo)";
+      }, 400);
+    }, 1100);
+
+    return;
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // MODO ANDROID NATIVO (app real)
+  // ═══════════════════════════════════════════════════════════════
   btn.textContent = "Leyendo…";
 
-  // Info del dispositivo
   try{
     document.getElementById("dev-name").textContent = Android.getDeviceInfo();
     document.getElementById("dev-meta").textContent = "Android " + Android.getAndroidVersion();
@@ -444,7 +508,6 @@ function startScan(){
     document.getElementById("tsub").textContent = Android.getDeviceInfo();
   }catch(e){}
 
-  // Barra de progreso
   var prog = document.getElementById("prog");
   var fill = document.getElementById("prog-fill");
   var lbl  = document.getElementById("prog-lbl");
@@ -467,7 +530,6 @@ function startScan(){
     lbl.textContent = steps[Math.min(step++, steps.length-1)];
   }, 300);
 
-  // Leer apps del sistema Android (en timeout para dejar que el UI se pinte)
   setTimeout(function(){
     try{
       var raw    = Android.getInstalledApps();
@@ -512,6 +574,103 @@ function finishScan(){
   btn.disabled = false; btn.textContent = "Re-analizar";
 
   renderList();
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+// FUNCIONES MODO DEMO (solo para navegador / GitHub Pages)
+// ═════════════════════════════════════════════════════════════════════════════
+
+function getDemoApps() {
+  return [
+    {
+      id: 101, name: "WhatsApp", package: "com.whatsapp", cat: "mensajería",
+      version: "2.24.12", installed: "12/01/2024", risk: "medio", score: 48,
+      totalPerms: 31, dangerousCount: 6,
+      perms: [
+        {name: "Cámara", level: "r"}, {name: "Micrófono", level: "r"},
+        {name: "Contactos", level: "r"}, {name: "Ubicación exacta", level: "r"}
+      ],
+      knownFlag: ""
+    },
+    {
+      id: 102, name: "Instagram", package: "com.instagram.android", cat: "redes sociales",
+      version: "320.0.0", installed: "05/03/2024", risk: "alto", score: 78,
+      totalPerms: 42, dangerousCount: 9,
+      perms: [
+        {name: "Cámara", level: "r"}, {name: "Micrófono", level: "r"},
+        {name: "Contactos", level: "r"}, {name: "Ubicación exacta", level: "r"}
+      ],
+      knownFlag: "Seguimiento entre apps y sitios web, reconocimiento facial activo"
+    },
+    {
+      id: 103, name: "Google Chrome", package: "com.android.chrome", cat: "navegador",
+      version: "125.0.6422", installed: "20/02/2024", risk: "bajo", score: 22,
+      totalPerms: 18, dangerousCount: 2,
+      perms: [{name: "Internet", level: "g"}],
+      knownFlag: ""
+    },
+    {
+      id: 104, name: "Truecaller", package: "com.truecaller", cat: "utilidades",
+      version: "13.45", installed: "18/11/2023", risk: "alto", score: 85,
+      totalPerms: 27, dangerousCount: 7,
+      perms: [
+        {name: "Contactos", level: "r"}, {name: "Historial llamadas", level: "r"}
+      ],
+      knownFlag: "Sube tu agenda completa a servidores externos sin opción de excluir contactos"
+    },
+    {
+      id: 105, name: "Signal", package: "org.thoughtcrime.securesms", cat: "mensajería",
+      version: "7.12.3", installed: "10/04/2024", risk: "seguro", score: 8,
+      totalPerms: 12, dangerousCount: 1,
+      perms: [{name: "Cámara", level: "r"}, {name: "Micrófono", level: "r"}],
+      knownFlag: ""
+    },
+    {
+      id: 106, name: "TikTok", package: "com.zhiliaoapp.musically", cat: "redes sociales",
+      version: "34.5.2", installed: "22/05/2024", risk: "alto", score: 91,
+      totalPerms: 38, dangerousCount: 11,
+      perms: [
+        {name: "Cámara", level: "r"}, {name: "Micrófono", level: "r"},
+        {name: "Contactos", level: "r"}, {name: "Ubicación", level: "r"}
+      ],
+      knownFlag: "Accede al portapapeles sin avisar y recopila datos del dispositivo masivamente"
+    },
+    {
+      id: 107, name: "Spotify", package: "com.spotify.music", cat: "música y audio",
+      version: "8.9.20", installed: "03/02/2024", risk: "bajo", score: 18,
+      totalPerms: 15, dangerousCount: 2,
+      perms: [{name: "Micrófono", level: "r"}],
+      knownFlag: ""
+    },
+    {
+      id: 108, name: "Bitwarden", package: "com.bitwarden.mobile", cat: "seguridad",
+      version: "2024.6.0", installed: "15/01/2024", risk: "seguro", score: 5,
+      totalPerms: 9, dangerousCount: 0,
+      perms: [],
+      knownFlag: ""
+    }
+  ];
+}
+
+function showDemoBanner() {
+  if (document.getElementById("demo-banner")) return;
+  var banner = document.createElement("div");
+  banner.id = "demo-banner";
+  banner.style.cssText = "margin:8px 18px 0;background:#1a2133;border:0.5px solid #ffffff28;border-radius:12px;padding:10px 14px;display:flex;align-items:center;gap:10px;";
+  banner.innerHTML = `
+    <div style="font-size:13px;color:#f5c542;flex:1;">
+      <strong>⚠️ Modo DEMO</strong> — Estos son datos de ejemplo.<br>
+      Instala la APK de ConfiAPP para analizar tus apps reales.
+    </div>
+    <button onclick="this.parentElement.remove()" 
+            style="background:transparent;border:0.5px solid #ffffff40;color:#fff;font-size:11px;padding:4px 10px;border-radius:8px;cursor:pointer;">
+      Entendido
+    </button>
+  `;
+  var topbar = document.querySelector(".topbar");
+  if (topbar && topbar.parentNode) {
+    topbar.parentNode.insertBefore(banner, topbar.nextSibling);
+  }
 }
 
 // ── Filtro ───────────────────────────────────────────────────────────────────
@@ -581,7 +740,6 @@ function renderList(){
       +'</div>';
   }).join("");
 
-  // Cargar íconos reales en background
   list.slice(0, 20).forEach(function(a){ loadIcon(a); });
 }
 
@@ -592,7 +750,6 @@ function loadIcon(a){
       var src = Android.getAppIcon(a.package);
       if(src && src.startsWith("data:image")){
         iconCache[a.package] = src;
-        // Actualizar íconos visibles en la lista
         document.querySelectorAll(".row").forEach(function(row){
           if(row.getAttribute("onclick") === "openSheet('"+a.id+"')"){
             var ico = row.querySelector(".aicon");
@@ -616,7 +773,6 @@ function openSheet(id){
   document.getElementById("sheet").scrollTop = 0;
   document.body.style.overflow = "hidden";
 
-  // Cargar ícono en el sheet si no está en caché
   if(!iconCache[app.package]){
     setTimeout(function(){
       try{
@@ -714,7 +870,6 @@ function buildSheet(app){
       +'<button class="abtn ab-out" onclick="closeSheet()">Cerrar</button>'
     +'</div>';
 
-  // Llamar IA
   if(aiCache[app.id]){
     var el = document.getElementById("ai-out");
     el.className = "ai-txt"; el.textContent = aiCache[app.id];
@@ -727,6 +882,14 @@ function buildSheet(app){
 function callAI(app){
   var el = document.getElementById("ai-out");
   if(!el) return;
+
+  if (!isAndroid) {
+    el.className = "ai-txt";
+    el.textContent = getDemoAIResponse(app);
+    aiCache[app.id] = el.textContent;
+    return;
+  }
+
   var permsStr = (app.perms||[]).map(function(p){ return p.name||p.n; }).join(", ")||"ninguno relevante";
   var flagStr  = app.knownFlag ? " Además, es una app conocida por: "+app.knownFlag+"." : "";
 
@@ -762,6 +925,19 @@ function callAI(app){
   });
 }
 
+function getDemoAIResponse(app) {
+  if (app.risk === "alto" || app.knownFlag) {
+    return app.name + " tiene un nivel de riesgo ALTO porque solicita muchos permisos sensibles (cámara, micrófono, contactos, ubicación) y tiene historial documentado de prácticas agresivas de recolección de datos. El riesgo más concreto es el seguimiento exhaustivo de tu actividad y posible venta de datos a terceros. Recomendación: desinstálala si no es esencial y busca alternativas más respetuosas con la privacidad.";
+  }
+  if (app.risk === "medio") {
+    return app.name + " tiene un nivel de riesgo MEDIO. Combina varios permisos sensibles, lo que permite un perfilado significativo. El riesgo principal es la exposición de datos personales. Recomendación: revisa los permisos en Ajustes de Android y limita los que no sean estrictamente necesarios.";
+  }
+  if (app.risk === "bajo") {
+    return app.name + " presenta un riesgo BAJO. Solo accede a permisos básicos necesarios para su función. Recomendación: puedes seguir usándola con normalidad, pero mantén la app actualizada.";
+  }
+  return app.name + " es considerada SEGURA. Solicita muy pocos permisos peligrosos y no tiene historial de abusos. Recomendación: excelente opción para usar sin preocupaciones de privacidad.";
+}
+
 // ── Errores ──────────────────────────────────────────────────────────────────
 function showError(msg){
   document.getElementById("app-list").innerHTML =
@@ -775,3 +951,4 @@ document.getElementById("sheet").addEventListener("touchmove",  function(e){ if(
 </script>
 </body>
 </html>
+    
