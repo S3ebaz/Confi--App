@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<title>ConfiAPP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#080b12;--bg2:#0e1320;--bg3:#131926;--bg4:#1a2133;
+  --border:#ffffff0d;--border2:#ffffff18;--border3:#ffffff28;
+  --text:#eef0f8;--text2:#7a84a8;--text3:#3d4562;
+  --red:#ff3d5a;--rbg:#ff3d5a0c;--rbd:#ff3d5a28;
+  --orange:#ff7c3d;--obg:#ff7c3d0c;--obd:#ff7c3d28;
+  --yellow:#f5c542;--ybg:#f5c5420c;--ybd:#f5c54228;
+  --green:#2ddc8a;--gbg:#2ddc8a0c;--gbd:#2ddc8a28;
+  --blue:#4f8ef7;--bbg:#4f8ef70c;--bbd:#4f8ef728;
+  --teal:#00d4c8;
+  --r:16px;--rsm:10px;--rxs:7px;
+  --f:'Outfit',system-ui,sans-serif;
+  --m:'JetBrains Mono',monospace;
+  --st:env(safe-area-inset-top);
+  --sb:env(safe-area-inset-bottom);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{background:var(--bg);color:var(--text);font-family:var(--f);min-height:100dvh;overflow-x:hidden}
+
+/* ── CONSENT SCREEN ── */
+#consent{
+  position:fixed;inset:0;z-index:999;
+  background:var(--bg);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:28px 24px calc(28px + var(--sb));
+}
+.cs-logo{
+  width:80px;height:80px;border-radius:22px;
+  background:linear-gradient(135deg,var(--blue),var(--teal));
+  display:flex;align-items:center;justify-content:center;
+  font-size:38px;margin-bottom:24px;
+  box-shadow:0 0 40px rgba(79,142,247,.35);
+}
+.cs-title{
+  font-size:26px;font-weight:700;letter-spacing:-.5px;
+  text-align:center;margin-bottom:8px;
+}
+.cs-sub{
+  font-size:14px;color:var(--text2);text-align:center;
+  line-height:1.65;margin-bottom:28px;
+}
+.cs-box{
+  width:100%;background:var(--bg2);border:0.5px solid var(--border2);
+  border-radius:var(--r);padding:18px;margin-bottom:28px;
+}
+.cs-box-title{
+  font-size:10px;font-weight:700;color:var(--text3);
+  letter-spacing:.12em;text-transform:uppercase;font-family:var(--m);
+  margin-bottom:12px;
+}
+.cs-item{
+  display:flex;align-items:flex-start;gap:10px;
+  padding:9px 0;border-bottom:0.5px solid var(--border);
+}
+.cs-item:last-child{border-bottom:none}
+.cs-item-icon{font-size:18px;flex-shrink:0;margin-top:1px}
+.cs-item-text{font-size:13px;color:var(--text2);line-height:1.55}
+.cs-item-text strong{color:var(--text);font-weight:600}
+.cs-privacy{
+  font-size:11px;color:var(--text3);text-align:center;
+  font-family:var(--m);margin-bottom:20px;line-height:1.6;
+}
+.cs-privacy span{color:var(--green)}
+.cs-btn{
+  width:100%;padding:18px;border-radius:var(--rsm);
+  background:linear-gradient(135deg,var(--blue),var(--teal));
+  color:#fff;font-family:var(--f);font-size:16px;font-weight:700;
+  border:none;cursor:pointer;letter-spacing:.1px;
+  box-shadow:0 0 24px rgba(79,142,247,.35);
+  transition:opacity .15s,transform .1s;
+}
+.cs-btn:active{opacity:.85;transform:scale(.98)}
+
+/* ── TOPBAR ── */
+.topbar{
+  position:sticky;top:0;z-index:100;
+  background:rgba(8,11,18,.9);border-bottom:0.5px solid var(--border2);
+  padding:calc(14px + var(--st)) 18px 14px;
+  display:flex;align-items:center;gap:12px;
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+}
+.tlogo{
+  width:36px;height:36px;border-radius:10px;
+  background:linear-gradient(135deg,var(--blue),var(--teal));
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;flex-shrink:0;
+  box-shadow:0 0 12px rgba(79,142,247,.35);
+}
+.ttitle{font-size:17px;font-weight:700;letter-spacing:-.4px;line-height:1}
+.tsub{font-size:10px;color:var(--text2);font-family:var(--m);margin-top:3px}
+.scan-btn{
+  margin-left:auto;
+  background:linear-gradient(135deg,var(--blue),var(--teal));
+  color:#fff;border:none;border-radius:var(--rsm);
+  padding:9px 16px;font-size:13px;font-weight:600;font-family:var(--f);
+  cursor:pointer;transition:opacity .15s,transform .1s;
+  box-shadow:0 0 10px rgba(79,142,247,.3);
+}
+.scan-btn:active{opacity:.8;transform:scale(.96)}
+.scan-btn:disabled{opacity:.4;pointer-events:none}
+
+/* ── DEVICE BAR ── */
+.dev-bar{
+  margin:12px 18px 0;
+  background:var(--bg2);border:0.5px solid var(--border2);
+  border-radius:var(--rsm);padding:10px 14px;
+  display:none;align-items:center;gap:10px;
+}
+.dev-bar.show{display:flex}
+.dev-bar-info{flex:1}
+.dev-name{font-size:13px;font-weight:600}
+.dev-meta{font-size:11px;color:var(--text2);font-family:var(--m);margin-top:1px}
+
+/* ── SEARCH ── */
+.search-wrap{padding:14px 18px 0}
+.sbox{
+  display:flex;align-items:center;gap:10px;
+  background:var(--bg2);border:0.5px solid var(--border2);
+  border-radius:var(--rsm);padding:0 14px;height:44px;
+  transition:border-color .15s;
+}
+.sbox:focus-within{border-color:var(--border3)}
+.sbox svg{width:15px;height:15px;flex-shrink:0;opacity:.3}
+.sbox input{
+  flex:1;background:transparent;border:none;outline:none;
+  font-family:var(--f);font-size:14px;color:var(--text);
+}
+.sbox input::placeholder{color:var(--text3)}
+
+/* ── FILTERS ── */
+.filters{display:flex;gap:6px;padding:12px 18px 0;overflow-x:auto;scrollbar-width:none}
+.filters::-webkit-scrollbar{display:none}
+.fc{
+  flex-shrink:0;font-size:11px;font-weight:600;
+  padding:5px 12px;border-radius:20px;cursor:pointer;
+  border:0.5px solid var(--border2);background:var(--bg2);
+  color:var(--text2);font-family:var(--m);transition:all .15s;
+}
+.fc.on{background:var(--bg4);color:var(--text);border-color:var(--border3)}
+.fc.fr.on{background:var(--rbg);color:var(--red);border-color:var(--rbd)}
+.fc.fo.on{background:var(--obg);color:var(--orange);border-color:var(--obd)}
+.fc.fy.on{background:var(--ybg);color:var(--yellow);border-color:var(--ybd)}
+.fc.fg.on{background:var(--gbg);color:var(--green);border-color:var(--gbd)}
+
+/* ── PROGRESS ── */
+.prog{padding:14px 18px 0;display:none}
+.prog.show{display:block}
+.prog-track{height:3px;background:var(--border2);border-radius:2px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--teal),var(--yellow));border-radius:2px;transition:width .25s;width:0%}
+.prog-lbl{font-size:10px;color:var(--text2);font-family:var(--m);margin-top:7px}
+
+/* ── STATS ── */
+.stats{display:none;grid-template-columns:repeat(4,1fr);gap:8px;padding:14px 18px}
+.stats.show{display:grid}
+.sc{
+  background:var(--bg2);border:0.5px solid var(--border);
+  border-radius:var(--rsm);padding:11px 6px;text-align:center;
+  cursor:pointer;transition:all .15s;
+}
+.sc.active-r{background:var(--rbg);border-color:var(--rbd)}
+.sc.active-o{background:var(--obg);border-color:var(--obd)}
+.sc.active-y{background:var(--ybg);border-color:var(--ybd)}
+.sc.active-g{background:var(--gbg);border-color:var(--gbd)}
+.sn{font-size:22px;font-weight:700;font-family:var(--m);line-height:1}
+.sl{font-size:9px;color:var(--text2);margin-top:3px;line-height:1.3;font-weight:500}
+.nr{color:var(--red)}.no{color:var(--orange)}.ny{color:var(--yellow)}.ng{color:var(--green)}
+
+/* ── SECTION LABEL ── */
+.sec-lbl{
+  font-size:9px;font-weight:700;color:var(--text3);
+  letter-spacing:.12em;text-transform:uppercase;font-family:var(--m);
+  padding:0 18px 10px;
+}
+
+/* ── APP LIST ── */
+.app-list{display:flex;flex-direction:column;gap:6px;padding:0 18px;padding-bottom:calc(24px + var(--sb))}
+.row{
+  background:var(--bg2);border:0.5px solid var(--border);
+  border-radius:var(--r);padding:14px;
+  display:flex;align-items:center;gap:12px;
+  cursor:pointer;transition:all .15s;
+}
+.row:active{background:var(--bg3);transform:scale(.99)}
+.row.sel{border-color:var(--sc,var(--blue));background:var(--sbg,var(--bbg))}
+.aicon{
+  width:44px;height:44px;border-radius:12px;
+  overflow:hidden;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:17px;font-weight:700;color:#fff;
+  border:0.5px solid var(--border2);
+}
+.aicon img{width:100%;height:100%;object-fit:cover}
+.ainfo{flex:1;min-width:0}
+.aname{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.acat{font-size:11px;color:var(--text2);margin-top:2px;font-family:var(--m)}
+.sbar{margin-top:5px;height:3px;background:var(--border2);border-radius:2px;overflow:hidden}
+.sbar-fill{height:100%;border-radius:2px;transition:width .6s}
+.badge{font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px;border:0.5px solid;white-space:nowrap;flex-shrink:0;font-family:var(--m)}
+.br{background:var(--rbg);color:var(--red);border-color:var(--rbd)}
+.bo{background:var(--obg);color:var(--orange);border-color:var(--obd)}
+.by{background:var(--ybg);color:var(--yellow);border-color:var(--ybd)}
+.bg{background:var(--gbg);color:var(--green);border-color:var(--gbd)}
+.chev{width:14px;height:14px;opacity:.2;flex-shrink:0}
+
+/* ── EMPTY / LOADING ── */
+.empty{padding:52px 20px;text-align:center}
+.empty-ico{font-size:36px;margin-bottom:8px;opacity:.35}
+.empty-txt{font-size:13px;color:var(--text3);line-height:1.6}
+.spin-wrap{padding:52px 20px;display:flex;flex-direction:column;align-items:center;gap:14px}
+.spin{width:44px;height:44px;border:3px solid var(--border2);border-top-color:var(--blue);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spin-txt{font-size:13px;color:var(--text2);text-align:center}
+
+/* ── SHEET ── */
+.overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;
+  opacity:0;pointer-events:none;transition:opacity .25s;
+  backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
+}
+.overlay.open{opacity:1;pointer-events:all}
+.sheet{
+  position:fixed;left:0;right:0;bottom:0;z-index:201;
+  background:var(--bg2);border-radius:22px 22px 0 0;
+  border:0.5px solid var(--border2);border-bottom:none;
+  max-height:92dvh;overflow-y:auto;
+  transform:translateY(100%);
+  transition:transform .32s cubic-bezier(.32,.72,0,1);
+  padding-bottom:calc(24px + var(--sb));
+}
+.sheet.open{transform:translateY(0)}
+.sheet::-webkit-scrollbar{width:0}
+.sh-handle{width:40px;height:4px;background:var(--border2);border-radius:2px;margin:14px auto 0}
+.sh-head{padding:16px 20px;border-bottom:0.5px solid var(--border)}
+.sh-top{display:flex;align-items:flex-start;gap:14px;margin-bottom:14px}
+.sh-icon{
+  width:56px;height:56px;border-radius:14px;overflow:hidden;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:24px;font-weight:700;color:#fff;border:0.5px solid var(--border2);
+}
+.sh-icon img{width:100%;height:100%;object-fit:cover}
+.sh-info{flex:1;min-width:0}
+.sh-name{font-size:20px;font-weight:700;letter-spacing:-.3px;line-height:1.1}
+.sh-cat{font-size:12px;color:var(--text2);margin-top:4px;font-family:var(--m)}
+.sh-pkg{font-size:10px;color:var(--text3);font-family:var(--m);margin-top:2px;word-break:break-all}
+.sh-meta{display:flex;gap:7px;margin-top:6px;flex-wrap:wrap}
+.mpill{font-size:10px;font-family:var(--m);color:var(--text3);padding:2px 8px;border:0.5px solid var(--border);border-radius:20px}
+.score-ring{
+  width:54px;height:54px;border-radius:50%;border:2px solid;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;
+}
+.srn{font-size:18px;font-weight:700;font-family:var(--m);line-height:1}
+.srl{font-size:8px;opacity:.6;font-weight:500;letter-spacing:.05em}
+.sr-r{border-color:var(--red);color:var(--red)}
+.sr-o{border-color:var(--orange);color:var(--orange)}
+.sr-y{border-color:var(--yellow);color:var(--yellow)}
+.sr-g{border-color:var(--green);color:var(--green)}
+.gb{background:var(--bg3);border-radius:var(--rxs);padding:10px 12px}
+.gb-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px}
+.gb-lbl{font-size:11px;font-weight:600;color:var(--text2)}
+.gb-val{font-size:12px;font-weight:700;font-family:var(--m)}
+.gb-track{height:5px;background:var(--border2);border-radius:3px;overflow:hidden}
+.gb-fill{height:100%;border-radius:3px;transition:width .8s}
+.sh-body{padding:16px 20px}
+.ssec{font-size:9px;font-weight:700;color:var(--text3);letter-spacing:.12em;text-transform:uppercase;font-family:var(--m);margin-bottom:10px;margin-top:16px}
+.ssec:first-child{margin-top:0}
+.pchips{display:flex;flex-wrap:wrap;gap:6px}
+.pchip{font-size:11px;padding:5px 11px;border-radius:20px;border:0.5px solid;font-family:var(--m);display:flex;align-items:center;gap:5px}
+.pc-r{background:var(--rbg);border-color:var(--rbd);color:var(--red)}
+.pc-o{background:var(--obg);border-color:var(--obd);color:var(--orange)}
+.pc-g{background:var(--gbg);border-color:var(--gbd);color:var(--green)}
+.pcdot{width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0}
+.known-flag{background:var(--rbg);border:0.5px solid var(--rbd);border-radius:var(--rsm);padding:12px;display:flex;gap:10px}
+.kf-title{font-size:13px;font-weight:600;color:var(--red);margin-bottom:3px}
+.kf-desc{font-size:12px;color:var(--text2);line-height:1.55}
+.sg{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.sm{background:var(--bg3);border:0.5px solid var(--border);border-radius:var(--rsm);padding:10px 12px}
+.sml{font-size:10px;color:var(--text3);font-family:var(--m);margin-bottom:3px}
+.smv{font-size:15px;font-weight:600;font-family:var(--m)}
+.ai-card{background:var(--bg3);border:0.5px solid var(--border2);border-radius:var(--r);padding:14px}
+.ai-hdr{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.aidot{width:8px;height:8px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--teal));animation:pulse 2s ease-in-out infinite;flex-shrink:0}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.85)}}
+.ailbl{font-size:9px;font-weight:700;color:var(--text2);letter-spacing:.12em;text-transform:uppercase;font-family:var(--m)}
+.ai-txt{font-size:13px;line-height:1.75;color:var(--text)}
+.ai-load{font-size:13px;color:var(--text3);display:flex;align-items:center;gap:8px}
+.aispin{width:14px;height:14px;border:1.5px solid var(--border2);border-top-color:var(--blue);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+.act-row{display:flex;flex-direction:column;gap:8px}
+.abtn{width:100%;padding:15px;border-radius:var(--rsm);font-family:var(--f);font-size:14px;font-weight:600;cursor:pointer;transition:opacity .15s,transform .1s;text-align:center;border:none}
+.abtn:active{opacity:.8;transform:scale(.98)}
+.ab-red{background:linear-gradient(135deg,var(--red),#ff6080);color:#fff}
+.ab-org{background:linear-gradient(135deg,var(--orange),#ffb83d);color:#fff}
+.ab-out{background:transparent;color:var(--text);border:0.5px solid var(--border3)}
+</style>
+</head>
+<body>
+
+<!-- ══ PANTALLA DE CONSENTIMIENTO ══ -->
+<div id="consent">
+  <div class="cs-logo">🛡️</div>
+  <h1 class="cs-title">ConfiAPP</h1>
+  <p class="cs-sub">Esta app analizará las aplicaciones instaladas<br>en tu dispositivo para medir su nivel de riesgo.</p>
+
+  <div class="cs-box">
+    <div class="cs-box-title">Qué se leerá del dispositivo</div>
+    <div class="cs-item">
+      <div class="cs-item-icon">📋</div>
+      <div class="cs-item-text"><strong>Lista de apps instaladas</strong> — nombres, versiones y fechas de instalación.</div>
+    </div>
+    <div class="cs-item">
+      <div class="cs-item-icon">🔑</div>
+      <div class="cs-item-text"><strong>Permisos declarados</strong> — qué permisos solicita cada app (cámara, GPS, contactos, etc.)</div>
+    </div>
+    <div class="cs-item">
+      <div class="cs-item-icon">📱</div>
+      <div class="cs-item-text"><strong>Modelo del dispositivo</strong> — fabricante y versión de Android.</div>
+    </div>
+    <div class="cs-item">
+      <div class="cs-item-icon">🤖</div>
+      <div class="cs-item-text"><strong>Análisis con IA</strong> — al ver el detalle de una app, se envía solo su nombre y permisos a Claude AI para generar una evaluación.</div>
+    </div>
+  </div>
+
+  <p class="cs-privacy">🔒 Toda la información se procesa <span>en tu dispositivo</span>.<br>La lista de apps nunca se envía a ningún servidor.</p>
+
+  <button class="cs-btn" onclick="consentAndScan()">Entendido — Analizar mis apps</button>
+</div>
+
+<!-- ══ APP PRINCIPAL (oculta hasta consentir) ══ -->
+<div id="main" style="display:none">
+
+  <div class="topbar">
+    <div class="tlogo">🛡️</div>
+    <div>
+      <div class="ttitle">ConfiAPP</div>
+      <div class="tsub" id="tsub">Analizador de seguridad</div>
+    </div>
+    <button class="scan-btn" id="scan-btn" onclick="startScan()">Re-analizar</button>
+  </div>
+
+  <div class="dev-bar" id="dev-bar">
+    <span style="font-size:20px">📱</span>
+    <div class="dev-bar-info">
+      <div class="dev-name" id="dev-name">—</div>
+      <div class="dev-meta" id="dev-meta">Android</div>
+    </div>
+  </div>
+
+  <div class="search-wrap">
+    <div class="sbox">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+      </svg>
+      <input id="q" placeholder="Buscar aplicación..." oninput="renderList()"/>
+    </div>
+  </div>
+
+  <div class="filters">
+    <div class="fc on" data-f="all"    onclick="setFilter('all',this)">Todas</div>
+    <div class="fc fr"  data-f="alto"  onclick="setFilter('alto',this)">⬤ Alto</div>
+    <div class="fc fo"  data-f="medio" onclick="setFilter('medio',this)">⬤ Medio</div>
+    <div class="fc fy"  data-f="bajo"  onclick="setFilter('bajo',this)">⬤ Bajo</div>
+    <div class="fc fg"  data-f="seguro" onclick="setFilter('seguro',this)">⬤ Seguro</div>
+  </div>
+
+  <div class="prog" id="prog">
+    <div class="prog-track"><div class="prog-fill" id="prog-fill"></div></div>
+    <div class="prog-lbl" id="prog-lbl">Leyendo apps...</div>
+  </div>
+
+  <div class="stats" id="stats">
+    <div class="sc" id="sc-r" onclick="setFilter('alto',null)">  <div class="sn nr" id="sr">0</div><div class="sl">Riesgo alto</div> </div>
+    <div class="sc" id="sc-o" onclick="setFilter('medio',null)"> <div class="sn no" id="so">0</div><div class="sl">Riesgo medio</div></div>
+    <div class="sc" id="sc-y" onclick="setFilter('bajo',null)">  <div class="sn ny" id="sy">0</div><div class="sl">Riesgo bajo</div> </div>
+    <div class="sc" id="sc-g" onclick="setFilter('seguro',null)"><div class="sn ng" id="sg">0</div><div class="sl">Seguras</div>     </div>
+  </div>
+
+  <div class="sec-lbl" id="sec-lbl" style="padding-top:14px">APLICACIONES INSTALADAS</div>
+  <div class="app-list" id="app-list">
+    <div class="spin-wrap">
+      <div class="spin"></div>
+      <div class="spin-txt">Leyendo apps instaladas…</div>
+    </div>
+  </div>
+
+</div><!-- #main -->
+
+<!-- ══ SHEET DETALLE ══ -->
+<div class="overlay" id="overlay" onclick="closeSheet()"></div>
+<div class="sheet" id="sheet">
+  <div class="sh-handle"></div>
+  <div class="sh-head" id="sh-head"></div>
+  <div class="sh-body" id="sh-body"></div>
+</div>
+
+<script>
+// ── Estado global ────────────────────────────────────────────────────────────
+var APPS     = [];
+var curId    = null;
+var filter   = "all";
+var aiCache  = {};
+var iconCache= {};
+
+// ── Helpers de color ─────────────────────────────────────────────────────────
+function rColor(r){ return {alto:"var(--red)",medio:"var(--orange)",bajo:"var(--yellow)",seguro:"var(--green)"}[r] }
+function rBg(r)   { return {alto:"var(--rbg)",medio:"var(--obg)",bajo:"var(--ybg)",seguro:"var(--gbg)"}[r] }
+function rBadge(r){ return {alto:"br",medio:"bo",bajo:"by",seguro:"bg"}[r] }
+function rRing(r) { return {alto:"sr-r",medio:"sr-o",bajo:"sr-y",seguro:"sr-g"}[r] }
+function rLabel(r){ return {alto:"ALTO",medio:"MEDIO",bajo:"BAJO",seguro:"SEGURO"}[r] }
+function sColor(s){ return s>=65?"var(--red)":s>=35?"var(--orange)":s>=15?"var(--yellow)":"var(--green)" }
+function avatarBg(name){
+  var cols=["#1a237e","#1b5e20","#4a148c","#880e4f","#e65100","#006064","#37474f","#1565c0"];
+  var h=0; for(var i=0;i<name.length;i++) h=(h*31+name.charCodeAt(i))|0;
+  return cols[Math.abs(h)%cols.length];
+}
+
+// ── Consentir y arrancar ─────────────────────────────────────────────────────
+function consentAndScan(){
+  document.getElementById("consent").style.display = "none";
+  document.getElementById("main").style.display    = "block";
+  startScan();
+}
+
+// ── Escanear ─────────────────────────────────────────────────────────────────
+function startScan(){
+  var btn = document.getElementById("scan-btn");
+  btn.disabled = true;
+  btn.textContent = "Leyendo…";
+
+  // Info del dispositivo
+  try{
+    document.getElementById("dev-name").textContent = Android.getDeviceInfo();
+    document.getElementById("dev-meta").textContent = "Android " + Android.getAndroidVersion();
+    document.getElementById("dev-bar").classList.add("show");
+    document.getElementById("tsub").textContent = Android.getDeviceInfo();
+  }catch(e){}
+
+  // Barra de progreso
+  var prog = document.getElementById("prog");
+  var fill = document.getElementById("prog-fill");
+  var lbl  = document.getElementById("prog-lbl");
+  prog.classList.add("show");
+  fill.style.width = "0%";
+
+  var steps = [
+    "Leyendo apps instaladas…",
+    "Analizando permisos…",
+    "Calculando puntuaciones de riesgo…",
+    "Identificando apps conocidas…",
+    "Finalizando análisis…"
+  ];
+  var pct  = 0;
+  var step = 0;
+  var iv = setInterval(function(){
+    pct += Math.random()*18 + 5;
+    if(pct > 85) pct = 85;
+    fill.style.width = pct + "%";
+    lbl.textContent = steps[Math.min(step++, steps.length-1)];
+  }, 300);
+
+  // Leer apps del sistema Android (en timeout para dejar que el UI se pinte)
+  setTimeout(function(){
+    try{
+      var raw    = Android.getInstalledApps();
+      var parsed = JSON.parse(raw);
+
+      if(parsed.length > 0 && parsed[0].error){
+        clearInterval(iv);
+        showError("Error al leer apps: " + parsed[0].error);
+        btn.disabled = false; btn.textContent = "Re-analizar";
+        prog.classList.remove("show");
+        return;
+      }
+
+      APPS = parsed;
+      clearInterval(iv);
+      fill.style.width = "100%";
+      lbl.textContent = APPS.length + " apps analizadas";
+      setTimeout(finishScan, 500);
+
+    }catch(e){
+      clearInterval(iv);
+      showError("Error: " + (e.message||e));
+      btn.disabled = false; btn.textContent = "Re-analizar";
+      prog.classList.remove("show");
+    }
+  }, 200);
+}
+
+function finishScan(){
+  document.getElementById("prog").classList.remove("show");
+  document.getElementById("stats").classList.add("show");
+
+  var c = {alto:0, medio:0, bajo:0, seguro:0};
+  APPS.forEach(function(a){ c[a.risk]++; });
+  document.getElementById("sr").textContent = c.alto;
+  document.getElementById("so").textContent = c.medio;
+  document.getElementById("sy").textContent = c.bajo;
+  document.getElementById("sg").textContent = c.seguro;
+  document.getElementById("sec-lbl").textContent = APPS.length + " APPS ANALIZADAS";
+
+  var btn = document.getElementById("scan-btn");
+  btn.disabled = false; btn.textContent = "Re-analizar";
+
+  renderList();
+}
+
+// ── Filtro ───────────────────────────────────────────────────────────────────
+function setFilter(f, el){
+  filter = f;
+  document.querySelectorAll(".fc").forEach(function(c){ c.classList.remove("on"); });
+  document.querySelectorAll(".sc").forEach(function(c){
+    c.className = c.className.replace(/ active-[rog]{1,2}/g,"");
+  });
+  if(el){ el.classList.add("on"); }
+  else{
+    var chip = document.querySelector(".fc[data-f='"+f+"']");
+    if(chip) chip.classList.add("on");
+    else document.querySelector(".fc[data-f='all']").classList.add("on");
+  }
+  var map = {alto:"sc-r active-r", medio:"sc-o active-o", bajo:"sc-y active-y", seguro:"sc-g active-g"};
+  if(map[f]){
+    var parts = map[f].split(" ");
+    var card  = document.getElementById(parts[0]);
+    if(card) card.classList.add(parts[1]);
+  }
+  renderList();
+}
+
+// ── Renderizar lista ─────────────────────────────────────────────────────────
+function renderList(){
+  var q    = (document.getElementById("q").value||"").toLowerCase();
+  var list = APPS.filter(function(a){
+    return a.name.toLowerCase().includes(q) ||
+           a.cat.includes(q) ||
+           a.package.toLowerCase().includes(q);
+  });
+  if(filter !== "all") list = list.filter(function(a){ return a.risk === filter; });
+
+  var el = document.getElementById("app-list");
+
+  if(!APPS.length){
+    el.innerHTML = '<div class="spin-wrap"><div class="spin"></div><div class="spin-txt">Cargando…</div></div>';
+    return;
+  }
+  if(!list.length){
+    el.innerHTML = '<div class="empty"><div class="empty-ico">🔍</div><div class="empty-txt">No se encontraron aplicaciones</div></div>';
+    return;
+  }
+
+  el.innerHTML = list.map(function(a){
+    var rc  = rColor(a.risk);
+    var rbg = rBg(a.risk);
+    var sel = curId === a.id;
+    var initials = a.name.replace(/[^a-zA-Z0-9]/g,"").substring(0,2).toUpperCase()||"??";
+    var bg  = avatarBg(a.name);
+    var ico = iconCache[a.package]
+      ? '<img src="'+iconCache[a.package]+'" alt=""/>'
+      : '<span>'+initials+'</span>';
+
+    return '<div class="row'+(sel?" sel":"")+'"'
+      +(sel?' style="--sc:'+rc+';--sbg:'+rbg+'"':'')+
+      ' onclick="openSheet(\''+a.id+'\')">'
+      +'<div class="aicon" style="background:'+bg+'">'+ico+'</div>'
+      +'<div class="ainfo">'
+        +'<div class="aname">'+a.name+'</div>'
+        +'<div class="acat">'+a.cat+'<span style="opacity:.5"> · '+a.dangerousCount+' perm. peligrosos</span></div>'
+        +'<div class="sbar"><div class="sbar-fill" style="width:'+a.score+'%;background:'+sColor(a.score)+'"></div></div>'
+      +'</div>'
+      +'<span class="badge '+rBadge(a.risk)+'">'+rLabel(a.risk)+'</span>'
+      +'<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>'
+      +'</div>';
+  }).join("");
+
+  // Cargar íconos reales en background
+  list.slice(0, 20).forEach(function(a){ loadIcon(a); });
+}
+
+function loadIcon(a){
+  if(iconCache[a.package]) return;
+  setTimeout(function(){
+    try{
+      var src = Android.getAppIcon(a.package);
+      if(src && src.startsWith("data:image")){
+        iconCache[a.package] = src;
+        // Actualizar íconos visibles en la lista
+        document.querySelectorAll(".row").forEach(function(row){
+          if(row.getAttribute("onclick") === "openSheet('"+a.id+"')"){
+            var ico = row.querySelector(".aicon");
+            if(ico) ico.innerHTML = '<img src="'+src+'" alt=""/>';
+          }
+        });
+      }
+    }catch(e){}
+  }, 60);
+}
+
+// ── Sheet ────────────────────────────────────────────────────────────────────
+function openSheet(id){
+  curId = parseInt(id);
+  renderList();
+  var app = APPS.find(function(a){ return a.id === curId; });
+  if(!app) return;
+  buildSheet(app);
+  document.getElementById("overlay").classList.add("open");
+  document.getElementById("sheet").classList.add("open");
+  document.getElementById("sheet").scrollTop = 0;
+  document.body.style.overflow = "hidden";
+
+  // Cargar ícono en el sheet si no está en caché
+  if(!iconCache[app.package]){
+    setTimeout(function(){
+      try{
+        var src = Android.getAppIcon(app.package);
+        if(src && src.startsWith("data:image")){
+          iconCache[app.package] = src;
+          var el = document.querySelector(".sh-icon");
+          if(el) el.innerHTML = '<img src="'+src+'" alt=""/>';
+        }
+      }catch(e){}
+    }, 100);
+  }
+}
+
+function closeSheet(){
+  document.getElementById("overlay").classList.remove("open");
+  document.getElementById("sheet").classList.remove("open");
+  document.body.style.overflow = "";
+}
+
+function buildSheet(app){
+  var rc  = rColor(app.risk);
+  var initials = app.name.replace(/[^a-zA-Z0-9]/g,"").substring(0,2).toUpperCase()||"??";
+  var bg  = avatarBg(app.name);
+  var ico = iconCache[app.package]
+    ? '<img src="'+iconCache[app.package]+'" alt=""/>'
+    : '<span>'+initials+'</span>';
+
+  document.getElementById("sh-head").innerHTML =
+    '<div class="sh-top">'
+      +'<div class="sh-icon" style="background:'+bg+'">'+ico+'</div>'
+      +'<div class="sh-info">'
+        +'<div class="sh-name">'+app.name+'</div>'
+        +'<div class="sh-cat">'+app.cat+'</div>'
+        +'<div class="sh-pkg">'+app.package+'</div>'
+        +'<div class="sh-meta">'
+          +'<span class="mpill">v'+(app.version||"?")+'</span>'
+          +'<span class="mpill">'+(app.installed||"—")+'</span>'
+          +'<span class="mpill">'+app.totalPerms+' permisos</span>'
+        +'</div>'
+      +'</div>'
+      +'<div class="score-ring '+rRing(app.risk)+'">'
+        +'<span class="srn">'+app.score+'</span>'
+        +'<span class="srl">RIESGO</span>'
+      +'</div>'
+    +'</div>'
+    +'<div class="gb">'
+      +'<div class="gb-row">'
+        +'<span class="gb-lbl">Puntuación de riesgo</span>'
+        +'<span class="gb-val" style="color:'+rc+'">'+app.score+'/100</span>'
+      +'</div>'
+      +'<div class="gb-track"><div class="gb-fill" style="width:'+app.score+'%;background:'+rc+'"></div></div>'
+    +'</div>';
+
+  var permsHtml = (app.perms && app.perms.length)
+    ? app.perms.map(function(p){
+        var lv = (p.level||p.l||"g");
+        return '<span class="pchip pc-'+lv+'"><span class="pcdot"></span>'+(p.name||p.n)+'</span>';
+      }).join("")
+    : '<span style="font-size:12px;color:var(--text3)">Sin permisos sensibles detectados</span>';
+
+  var knownHtml = app.knownFlag
+    ? '<div class="ssec">⚠️ APP CONOCIDA COMO RIESGOSA</div>'
+      +'<div class="known-flag">'
+        +'<span style="font-size:18px;flex-shrink:0">🚨</span>'
+        +'<div><div class="kf-title">Riesgo documentado</div>'
+        +'<div class="kf-desc">'+app.knownFlag+'</div></div>'
+      +'</div>'
+    : "";
+
+  var actionHtml = (app.risk === "alto" || app.knownFlag)
+    ? '<button class="abtn ab-red" onclick="closeSheet()">Desinstala o busca alternativa a '+app.name+'</button>'
+    : (app.risk === "medio"
+        ? '<button class="abtn ab-org" onclick="closeSheet()">Reduce el riesgo de '+app.name+'</button>'
+        : "");
+
+  document.getElementById("sh-body").innerHTML =
+    '<div class="ssec">PERMISOS SENSIBLES ('+app.dangerousCount+' peligrosos)</div>'
+    +'<div class="pchips">'+permsHtml+'</div>'
+    +knownHtml
+    +'<div class="ssec">ESTADÍSTICAS</div>'
+    +'<div class="sg">'
+      +'<div class="sm"><div class="sml">SCORE</div><div class="smv" style="color:'+rc+'">'+app.score+'/100</div></div>'
+      +'<div class="sm"><div class="sml">PELIGROSOS</div><div class="smv" style="color:'+rc+'">'+app.dangerousCount+'</div></div>'
+      +'<div class="sm"><div class="sml">TOTAL PERMS</div><div class="smv">'+app.totalPerms+'</div></div>'
+    +'</div>'
+    +'<div class="ssec">ANÁLISIS CON IA</div>'
+    +'<div class="ai-card">'
+      +'<div class="ai-hdr"><div class="aidot"></div><span class="ailbl">Evaluación de seguridad</span></div>'
+      +'<div id="ai-out" class="ai-load"><div class="aispin"></div> Analizando con IA…</div>'
+    +'</div>'
+    +'<div class="ssec">ACCIONES</div>'
+    +'<div class="act-row">'
+      +actionHtml
+      +'<button class="abtn ab-out" onclick="closeSheet()">Cerrar</button>'
+    +'</div>';
+
+  // Llamar IA
+  if(aiCache[app.id]){
+    var el = document.getElementById("ai-out");
+    el.className = "ai-txt"; el.textContent = aiCache[app.id];
+  } else {
+    callAI(app);
+  }
+}
+
+// ── Claude AI ────────────────────────────────────────────────────────────────
+function callAI(app){
+  var el = document.getElementById("ai-out");
+  if(!el) return;
+  var permsStr = (app.perms||[]).map(function(p){ return p.name||p.n; }).join(", ")||"ninguno relevante";
+  var flagStr  = app.knownFlag ? " Además, es una app conocida por: "+app.knownFlag+"." : "";
+
+  fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 1000,
+      messages: [{
+        role: "user",
+        content: "Eres experto en seguridad móvil Android. Analiza la app \""
+          +app.name+"\" (paquete: "+app.package+", categoría: "+app.cat+"). "
+          +"Permisos sensibles detectados: "+permsStr+". "
+          +"Puntuación de riesgo: "+app.score+"/100 (nivel: "+app.risk+")."+flagStr
+          +" En 3-4 oraciones cortas en español claro, sin markdown: "
+          +"1) por qué tiene este nivel de riesgo, "
+          +"2) cuál es el riesgo más concreto para el usuario, "
+          +"3) recomendación práctica sobre si usarla y cómo."
+      }]
+    })
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(d){
+    var txt = (d.content||[]).reduce(function(s,b){ return s+(b.type==="text"?b.text:""); },"")
+           || "No se pudo generar el análisis.";
+    var out = document.getElementById("ai-out");
+    if(out){ out.className = "ai-txt"; out.textContent = txt; aiCache[app.id] = txt; }
+  })
+  .catch(function(){
+    var out = document.getElementById("ai-out");
+    if(out){ out.className = "ai-txt"; out.textContent = "Sin conexión para análisis con IA. Revisa tu internet."; }
+  });
+}
+
+// ── Errores ──────────────────────────────────────────────────────────────────
+function showError(msg){
+  document.getElementById("app-list").innerHTML =
+    '<div class="empty"><div class="empty-ico">⚠️</div><div class="empty-txt">'+msg+'</div></div>';
+}
+
+// ── Swipe down para cerrar el sheet ─────────────────────────────────────────
+var startY = 0;
+document.getElementById("sheet").addEventListener("touchstart", function(e){ startY = e.touches[0].clientY; }, {passive:true});
+document.getElementById("sheet").addEventListener("touchmove",  function(e){ if(e.touches[0].clientY - startY > 70) closeSheet(); }, {passive:true});
+</script>
+</body>
+</html>
